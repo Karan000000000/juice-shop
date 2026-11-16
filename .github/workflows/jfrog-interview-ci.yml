@@ -41,3 +41,22 @@ jobs:
 
       - name: Verify Docker image
         run: docker image inspect juice-shop:interview
+
+        
+      - name: Log in to JFrog Artifactory
+        uses: docker/login-action@v3
+        with:
+          registry: karanjfrogdemo.jfrog.io
+          username: ${{ secrets.JF_USERNAME }}
+          password: ${{ secrets.JF_ACCESS_TOKEN }}
+
+      - name: Tag Docker image for JFrog
+        run: |
+          docker tag juice-shop:interview \
+            karanjfrogdemo.jfrog.io/docker-dev-local/juice-shop:${{ github.run_number }}
+
+      - name: Upload Docker image to JFrog
+        run: |
+          docker push \
+            karanjfrogdemo.jfrog.io/docker-dev-local/juice-shop:${{ github.run_number }}
+
