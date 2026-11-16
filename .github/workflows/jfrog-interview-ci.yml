@@ -1,0 +1,43 @@
+
+name: JFrog Interview - Build and Test
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      NODE_OPTIONS: --max_old_space_size=4096
+
+    steps:
+      - name: Download application code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install application dependencies
+        run: npm install
+
+      - name: Compile application
+        run: npm run build
+
+      - name: Run existing server tests
+        run: npm run test:server
+
+      - name: Build Docker image
+        run: docker build -t juice-shop:interview .
+
+      - name: Verify Docker image
+        run: docker image inspect juice-shop:interview
